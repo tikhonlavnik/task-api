@@ -1,11 +1,11 @@
 import logging
 from abc import ABC
-from typing import Optional, List, Type, Union
+from typing import List
 
+from sqlalchemy import select, delete
 from sqlalchemy.orm import Session
 
-# from src.api.exceptions.task_exceptions import TaskNotFoundError
-from core.exceptions import AppError, NotFoundError
+from core.exceptions import NotFoundError
 from src.domain.models.task import Task
 from src.domain.repositories.base_task_repo import ITaskRepository
 
@@ -18,25 +18,31 @@ class TaskRepository(ITaskRepository, ABC):
         self._db = db
         self.model = Task
 
-    def get_by_id(self, task_id: int) -> Type[Task]:
+    def get_by_id(self, task_id: int) -> Task:
         with self._db as session:
-            task = session.query(self.model).filter(self.model.id == task_id).first()
+            task = session.get(self.model, task_id)
+
             if not task:
                 logger.error(f"Ошибка при получении задачи с {task_id=}")
                 raise NotFoundError("Task")
             return task
 
-    def get_list(self, params: dict = None) -> tuple[list[Type[Task]], int]:
+    def get_list(self, params: dict = None) -> List[Task]:
         with self._db as session:
-            tasks_list = session.query(self.model).all()
-            if not params:
-                tasks_list = session.query(self.model).filter(**params).all()
-            if not tasks_list:
-                logger.error(f"Ошибка при получении списка задач")
-                raise NotFoundError("Tasks list")
-            return tasks_list, 100
+            query = select(self.model)
 
-    def create(self, data: dict) -> Optional[Task]:
+            if params:
+                query = query.filter_by(**params)
+
+            tasks_list = session.scalars(query).all()
+
+            if not tasks_list:
+                logger.error("Ошибка при получении списка задач")
+                raise NotFoundError("Tasks list")
+
+            return tasks_list
+
+    def create(self, data: dict) -> Task:
         with self._db as session:
             new_task = self.model(**data)
             session.add(new_task)
@@ -44,8 +50,26 @@ class TaskRepository(ITaskRepository, ABC):
             session.refresh(new_task)
             return new_task
 
-    def update(self, task_id: int, data: dict) -> Optional[Task]:
-        pass
+    def update(self, task_id: int, data: dict) -> Task:
+        with self._db as session:
+            task = session.get(self.model, task_id)
+            if not task:
+                raise NotFoundError("Task while updating")
 
-    def delete(self, task_id: int) -> Optional[Task]:
-        pass
+            for key, value in data.items():
+                setattr(task, key, value)
+
+            session.commit()
+            session.refresh(task)
+            return task
+
+    def delete(self, task_id: int) -> int:
+        with self._db as session:
+            if not session.get(self.model, task_id):
+                raise NotFoundError("Task while deleting")
+
+            session.execute(
+                delete(Task).filter_by(id=task_id).returning(Task)
+            ).scalar_one()
+            session.commit()
+            return task_id

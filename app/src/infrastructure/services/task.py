@@ -1,5 +1,9 @@
-from core.exceptions import AppError
-from src.dto.task import BaseTaskSchema, ResponseTaskSchema, ResponseListTaskSchema
+from src.dto.task import (
+    BaseTaskSchema,
+    ResponseTaskSchema,
+    ResponseListTaskSchema,
+    ResponseDeleteTaskSchema,
+)
 from src.infrastructure.repositories.task_repo import TaskRepository
 
 
@@ -16,5 +20,14 @@ class TaskService:
         return ResponseTaskSchema(**task.to_dict())
 
     def get_tasks_list(self) -> ResponseListTaskSchema:
-        tasks_list, count = self.repo.get_list()
-        return ResponseListTaskSchema(tasks_list=tasks_list, count=count)
+        tasks_list = self.repo.get_list()
+        tasks_list = [ResponseTaskSchema(**task.to_dict()) for task in tasks_list]
+        return ResponseListTaskSchema(data=tasks_list)
+
+    def update_task(self, task_id: int, data: BaseTaskSchema) -> ResponseTaskSchema:
+        task = self.repo.update(task_id, data.model_dump())
+        return ResponseTaskSchema(**task.to_dict())
+
+    def delete_task(self, task_id: int) -> ResponseDeleteTaskSchema:
+        task_id = self.repo.delete(task_id)
+        return ResponseDeleteTaskSchema(id=task_id)

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, List, Type
+from typing import Optional, List
 
 from pydantic import BaseModel
 
@@ -20,5 +20,8 @@ class ResponseTaskSchema(BaseTaskSchema):
 
 
 class ResponseListTaskSchema(BaseModel):
-    data: List[Type[ResponseTaskSchema]]
-    count: int
+    data: List[ResponseTaskSchema]
+
+
+class ResponseDeleteTaskSchema(BaseModel):
+    id: int
