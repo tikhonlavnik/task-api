@@ -2,7 +2,6 @@ from celery.result import AsyncResult
 from fastapi import APIRouter
 
 from bg_tasks.progress_task import long_task
-
 from celery_app import celery_app
 
 progress_router = APIRouter(prefix="/progress")

@@ -1,9 +1,5 @@
-from src.dto.task import (
-    BaseTaskSchema,
-    ResponseTaskSchema,
-    ResponseListTaskSchema,
-    ResponseDeleteTaskSchema,
-)
+from src.dto.task import (BaseTaskSchema, ResponseDeleteTaskSchema,
+                          ResponseListTaskSchema, ResponseTaskSchema)
 from src.infrastructure.repositories.task_repo import TaskRepository
 
 

@@ -2,13 +2,12 @@ import logging
 from abc import ABC
 from typing import List
 
-from sqlalchemy import select, delete
+from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from core.exceptions import NotFoundError
 from src.domain.models.task import Task
 from src.domain.repositories.base_task_repo import ITaskRepository
-
 
 logger = logging.Logger(__name__)
 

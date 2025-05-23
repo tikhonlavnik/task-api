@@ -3,13 +3,8 @@ from starlette import status
 
 from core.exceptions import AppError
 from src.api.dependencies import get_task_service
-
-from src.dto.task import (
-    BaseTaskSchema,
-    ResponseTaskSchema,
-    ResponseListTaskSchema,
-    ResponseDeleteTaskSchema,
-)
+from src.dto.task import (BaseTaskSchema, ResponseDeleteTaskSchema,
+                          ResponseListTaskSchema, ResponseTaskSchema)
 from src.infrastructure.services.task import TaskService
 
 task_router = APIRouter(prefix="/tasks")

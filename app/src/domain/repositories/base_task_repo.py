@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional, List
+from typing import List, Optional
 
 from src.domain.models.task import Task
 from src.dto.task import BaseTaskSchema
