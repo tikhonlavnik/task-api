@@ -16,7 +16,7 @@
 - Celery
 - Redis
 - SQLAlchemy
-- Docker + Docker Compose]
+- Docker + Docker Compose
 
 ## Установка и запуск
 
